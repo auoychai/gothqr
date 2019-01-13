@@ -1,0 +1,24 @@
+{
+    "name": "API",
+    "version":0.1,
+	"env":"development",
+	"port": 4001,
+	"base_url":"",
+	"db": {
+        "uri":"mongodb://127.0.0.1:27017",
+        "dbname":"test"
+    },
+    "options":{
+        "user":"espreeAdmin",
+        "pass":"JSLck2018",
+        "authSource":"espreecore",
+        "autoIndex": false,
+        "reconnectTries": 9007199254740991,
+        "reconnectInterval": 1000,
+        "poolSize": 10,
+        "bufferMaxEntries": -1,
+        "maxStalenessSeconds":600
+    },
+    "fcm_url":"https://fcm.googleapis.com/fcm/send",
+    "fcm_key":"Key=AIzULTtCCyKpBRO2cxYxMKEc0TlRTD59B012XFyWbg"
+}
