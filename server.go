@@ -1,12 +1,20 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/auoychai/gothqr/config"
+	"github.com/auoychai/gothqr/controllers"
 	"github.com/auoychai/gothqr/db"
 	"github.com/auoychai/gothqr/service"
-	_ "github.com/labstack/echo"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 type Person struct {
@@ -28,31 +36,58 @@ func main() {
 	dbProp.Connect()
 	defer db.DisConnect()
 
+	//for test call data operation 
 	service.Insert()
 	service.GetPeople()
+	// *****************************
 
-	/*
-		e := echo.New()
 
-		// Middleware
-		e.Use(middleware.Logger())
-		e.Use(middleware.Recover())
 
-		// CORS
-		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins: []string{"*"},
-			AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE },
-		}))
+	// Start point for Web API , Http Server 
+	httpServer := echo.New()
+	// Middleware
+	httpServer.Use(middleware.Logger())
+	httpServer.Use(middleware.Recover())
 
-		e.GET("/",func(c echo.Context) error {
+	// CORS
+	httpServer.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
+	}))
 
-			return c.String(http.StatusOK, "Hello, World!\n")
-		})
+	httpServer.GET("/", func(c echo.Context) error {
 
-		e.POST("/users",controllers.CreateUser)
+		return c.String(http.StatusOK, "Hello, World!\n")
+	})
+	httpServer.POST("/users", controllers.CreateUser)
 
-		// Server
+	// Suparate start http server to sub-process with Goroutine
+	// Let it main go routine jump to next section for handle shutting down
+	go func() {
+		err = httpServer.Start(":8080")
 
-		e.Start(":8080")
-	*/
+		if err != nil {
+			if err != http.ErrServerClosed {
+				panic("Error starting server! " + err.Error())
+			} else {
+				fmt.Printf("Goroutine |--> Shutting down...")
+			}
+		}
+
+	}()
+
+	fmt.Printf("Going to httpServer Shutdown handling ...")
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err = httpServer.Shutdown(ctx); err != nil {
+		panic("Server did not shut down before timeout: " + err.Error())
+	} else {
+		fmt.Println("Server shutdown")
+	}
+
+	fmt.Println("Finally")
 }
