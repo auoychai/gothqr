@@ -27,7 +27,7 @@ func Insert() {
 
 }
 
-func GetPeople() {
+func GetPeople() ([]Person,error) {
 
 	var person []Person
 
@@ -40,10 +40,11 @@ func GetPeople() {
 
 	err = c.Find(bson.M{"name": "Ale"}).One(&result)
 	err = c.Find(bson.M{}).All(&person)
-
+/*
 	if err != nil {
 		log.Fatal(err)
 	}
+
 
 	fmt.Println("Phone:", result.Phone)
 
@@ -52,5 +53,6 @@ func GetPeople() {
 		fmt.Println("Name , Phone", info.Name, " ", info.Phone)
 
 	}
-
+*/
+	return person,err
 }

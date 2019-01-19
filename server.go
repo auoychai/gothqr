@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/auoychai/gothqr/apicontrol"
 	"github.com/auoychai/gothqr/config"
-	"github.com/auoychai/gothqr/controllers"
 	"github.com/auoychai/gothqr/db"
 	"github.com/auoychai/gothqr/service"
 	"github.com/labstack/echo"
@@ -36,35 +36,32 @@ func main() {
 	dbProp.Connect()
 	defer db.DisConnect()
 
-	//for test call data operation 
+	// for test call data operation
+	// this call for inital or repeat insert data to mongodb collection
+	// You can comment after you don't need to repeate insert data on very next run this api service
 	service.Insert()
-	service.GetPeople()
 	// *****************************
+	// Start point for Web API , Http Server
 
+	eHttpServer := echo.New()
 
-
-	// Start point for Web API , Http Server 
-	httpServer := echo.New()
-	// Middleware
-	httpServer.Use(middleware.Logger())
-	httpServer.Use(middleware.Recover())
-
+	// Declare Middleware
+	eHttpServer.Use(middleware.Logger())
+	eHttpServer.Use(middleware.Recover())
 	// CORS
-	httpServer.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	eHttpServer.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 	}))
 
-	httpServer.GET("/", func(c echo.Context) error {
-
-		return c.String(http.StatusOK, "Hello, World!\n")
-	})
-	httpServer.POST("/users", controllers.CreateUser)
+	// Declare api route
+	eHttpServer.POST("/users", apicontrol.CreateUser)
+	eHttpServer.GET("/people", apicontrol.GetPeople)
 
 	// Suparate start http server to sub-process with Goroutine
 	// Let it main go routine jump to next section for handle shutting down
 	go func() {
-		err = httpServer.Start(":8080")
+		err = eHttpServer.Start(":8080")
 
 		if err != nil {
 			if err != http.ErrServerClosed {
@@ -76,18 +73,19 @@ func main() {
 
 	}()
 
-	fmt.Printf("Going to httpServer Shutdown handling ...")
+	fmt.Printf("Going to eHttpServer Shutdown handling ...")
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if err = httpServer.Shutdown(ctx); err != nil {
+	if err = eHttpServer.Shutdown(ctx); err != nil {
 		panic("Server did not shut down before timeout: " + err.Error())
 	} else {
 		fmt.Println("Server shutdown")
 	}
 
 	fmt.Println("Finally")
+
 }
