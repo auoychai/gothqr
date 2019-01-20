@@ -2,9 +2,14 @@ package apicontrol
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/auoychai/gothqr/service"
 	"github.com/labstack/echo"
+
+	"encoding/json"
+	"fmt"
+	"strconv"
 )
 
 // create user
@@ -36,3 +41,71 @@ func GetPeople(c echo.Context) error {
 	}
 	fmt.Println(string(b))
 */
+
+
+func QueryData(c echo.Context) error {
+
+	name := c.QueryParam("name")
+
+	tmp := "Name:" + name
+	fmt.Println(tmp)
+
+	age := 35
+
+	xx := `{"firstName":"` + name + `","lastName":"Dow" ,"age":` + strconv.Itoa(age) + `}`
+	fmt.Println("YY:", xx)
+	rawIn := json.RawMessage(xx)
+
+	var v interface{}
+	_ = json.Unmarshal(rawIn, &v)
+
+	return c.JSON(http.StatusOK, &v)
+}
+
+
+func PathData(c echo.Context) error {
+
+	name := c.Param("name")
+
+	tmp := "Name:" + name
+	fmt.Println(tmp)
+
+	age := 35
+
+	xx := `{"firstName":"` + name + `","lastName":"Dow" ,"age":` + strconv.Itoa(age) + `}`
+	fmt.Println("YY:", xx)
+	rawIn := json.RawMessage(xx)
+
+	var v interface{}
+	_ = json.Unmarshal(rawIn, &v)
+
+	return c.JSON(http.StatusOK, &v)
+}
+
+
+func CustomRetJson(c echo.Context) error {
+
+	name := "Auoychai"
+	tmp := "Name:" + name
+	fmt.Println(tmp)
+
+	age := 35
+
+	xx := `{"firstName":"` + name + `","lastName":"Dow" ,"age":` + strconv.Itoa(age) + `}`
+	fmt.Println("YY:", xx)
+	rawIn := json.RawMessage(xx)
+
+	var v interface{}
+	_ = json.Unmarshal(rawIn, &v)
+
+	// Let try time data ------------------
+	start := time.Now()
+	fmt.Println("Time:",start)
+	t := time.Now()
+	elapsed := t.Sub(start)
+	fmt.Println("Time-Elapsed:",elapsed)
+	// -------------------------------------
+
+	return c.JSON(http.StatusOK, &v)
+}
+

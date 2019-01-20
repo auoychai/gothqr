@@ -58,6 +58,12 @@ func main() {
 	eHttpServer.POST("/users", apicontrol.CreateUser)
 	eHttpServer.GET("/people", apicontrol.GetPeople)
 
+	eHttpServer.GET("/querydata", apicontrol.QueryData)
+	eHttpServer.GET("/pathdata/:name", apicontrol.PathData)
+	eHttpServer.GET("/customReturnJson", apicontrol.CustomRetJson)
+
+	eHttpServer.POST("/genqr", apicontrol.PayWithThQR)
+
 	// Suparate start http server to sub-process with Goroutine
 	// Let it main go routine jump to next section for handle shutting down
 	go func() {
