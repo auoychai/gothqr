@@ -8,13 +8,16 @@ The project purpose for study go programming and  application development. That 
   3. Complete all function for prove go coding and go language technique with old requirement from Node.js </br>
 
 # Working log
-  Branch: master
+  - Branch: master
     Initial project structure and promote mongodb connection manager and insert , read data function
-  Branch: ep1
+    
+  - Branch: ep1
     Add Eco Http framework for start Web API development and 2 endpoint example. And added system shuting down handling.
-  Branch: ep2
+    
+  - Branch: ep2
     Clean code by separate routing api function to other package and go file. And example endpoint return array of json object
-  Branch: ep3
+    
+  - Branch: ep3
     Add example real endpoint for you take to use in your job, That include GET method with Query string , PathData and POST methd with extract json input data to MAP. And use string package to manipulate string data.
     
 # Prerequisites
